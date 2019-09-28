@@ -1,0 +1,9 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\VIRUS-TEST\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\VIRUS-TEST\\.nuget\\packages",
+      "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+    ]
+  }
+}
