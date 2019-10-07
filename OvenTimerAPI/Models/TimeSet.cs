@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace OvenTimerAPI
@@ -6,6 +7,7 @@ namespace OvenTimerAPI
     {
         public enum TimeStatus { Stopped, Started };
 
+        [Key]
         [JsonProperty(PropertyName = "id", Required = Required.Always)]
         public string Id { get; set; }
 

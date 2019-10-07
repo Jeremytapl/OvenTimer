@@ -8,14 +8,13 @@
             <span class="display-3">:</span>
             <v-col cols="2"><v-text-field class="display-1" :error="!secondValid" label="Default Seconds" placeholder="00" outlined :value="second" @change="second = $event"></v-text-field></v-col>
             <v-col cols="3">
-                <v-btn class="mt-2" :disabled="!timeValid" large color="primary" @click="setDefaultTime">Set</v-btn>
-                <v-btn class="ml-2 mt-2" :disabled="!timeValid" large color="error" @click="setDefaultTime">Reset All</v-btn>
+                <v-btn class="mt-2" :disabled="!timeValid" large color="primary" @click="setDefaultTime">Set / Reset</v-btn>
             </v-col>            
         </v-row>
 
         <v-row justify="center" no-gutters v-if="showClocks">
             <v-col :ref="'items'" cols="3" justify="center" v-bind:key="item.id" v-for="item of items">
-                <timer v-model="item.time" :ref="'item-' + item.id" :caption="item.id"></timer>                
+                <timer v-model="item.time" :ref="'item-' + item.id" :caption="item.id" :timer-id="item.id"></timer>                
             </v-col>
         </v-row>
     </div>
@@ -127,8 +126,12 @@ export default {
                 connection.on('ReceiveInput', (data) => {                    
                     let key = 'item-' + data.trim().trimEnd('-');
                     
-                    if(_self.$refs[key] != null && _self.$refs[key].length) {                        
-                        _self.$refs[key][0].toggle();
+                    if(_self.$refs[key] != null && _self.$refs[key].length) {
+                        if(data.toString().endsWith('-')) {
+                            _self.$refs[key][0].reset();
+                        } else {
+                            _self.$refs[key][0].toggle();
+                        }                        
                     }
                 }); 
 

@@ -38,6 +38,8 @@ namespace OvenTimerAPI.Services
         public void UpdateTimeSet(TimeSet timeSet) 
         {
             var t = _ctx.TimeSets.Update(timeSet);
+            
+            _ctx.SaveChanges();
         } 
     }
 }

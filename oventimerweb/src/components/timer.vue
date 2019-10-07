@@ -18,7 +18,14 @@
 export default {
     props: {
         caption: null,
-        value: String
+        timerId: {
+            required: true,
+            type: String
+        },
+        value: {
+            required: true,
+            type: String
+        }
     },    
     created() {        
         this.parseValue();
@@ -26,6 +33,7 @@ export default {
     data() {
         return {     
             isComplete: false,
+            initValue: this.value,
             hour: '',
             minute: '',
             second: '',
@@ -41,14 +49,16 @@ export default {
                 this.stopTimer();
             }
         },
-        value: function() {
+        value: function(val) {
+            this.initValue = val;
+
             this.parseValue();
         }
     }, 
     methods: {
         parseValue: function() {
-            if(this.value != null) {
-                let splitter = this.value.toString().split(':');
+            if(this.initValue != null) {
+                let splitter = this.initValue.toString().split(':');
 
                 if(splitter.length == 3) {
                     this.hour = splitter[0];
@@ -56,10 +66,12 @@ export default {
                     this.second = splitter[2];
                 }
             }
+        },        
+        reset: function() {
+            this.isComplete = false;
+            this.parseValue();            
         },
         startTimer: function() {
-            this.isComplete = false;
-
             if(this.timer == null) {
                 let hourInt = Number.parseInt(this.hour);
                 let minuteInt = Number.parseInt(this.minute);
@@ -94,6 +106,8 @@ export default {
                     _self.hour = _self.$getFormatTime(hourInt);
                     _self.minute = _self.$getFormatTime(minuteInt);
                     _self.second = _self.$getFormatTime(secondInt);
+
+                    _self.updateService();
                 }, 1000);
             }
         },
@@ -104,6 +118,18 @@ export default {
         },
         toggle: function() {            
             this.started = !this.started;
+        },
+        updateService: async function() {
+            let timeSet = {
+                id: this.timerId,  
+                hour: this.hour,
+                minute: this.minute,
+                second: this.second
+            }
+
+            await this.$http.patch('timer', timeSet).catch(err => {
+                this.$showError(err, 'Update Timer');
+            });
         }
     }
 }
