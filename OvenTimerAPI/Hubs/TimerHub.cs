@@ -17,14 +17,12 @@ namespace OvenTimerAPI
             _config = configuration;
         }
         
-        public async Task StartListener()
+        public async Task StartListener(string comPort)
         {
             Func<string, Task> sendMessageCallback = SendMessage;
 
             try
             {
-                string comPort = _config["ComPort"];                
-
                 using (var arduino = new ArduinoService(comPort, sendMessageCallback))
                 { }
             }

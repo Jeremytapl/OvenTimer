@@ -1,13 +1,14 @@
 <template>
     <div>
         <v-row justify="center">
+            <v-col cols="1"><v-text-field class="display-1" :error="!hourValid" label="COM Port" placeholder="9" outlined :value="comPort" @change="comPort = $event"></v-text-field></v-col>
             <v-col cols="2"><v-text-field class="display-1" :error="!hourValid" label="Number of Timers" placeholder="10" outlined :value="count" @change="count = $event"></v-text-field></v-col>
             <v-col cols="2"><v-text-field class="display-1" :error="!hourValid" label="Default Hours" placeholder="00" outlined :value="hour" @change="hour = $event"></v-text-field></v-col>
             <span class="display-3">:</span>
             <v-col cols="2"><v-text-field class="display-1" :error="!minuteValid" label="Default Minutes" placeholder="00" outlined :value="minute" @change="minute = $event"></v-text-field></v-col>
             <span class="display-3">:</span>
             <v-col cols="2"><v-text-field class="display-1" :error="!secondValid" label="Default Seconds" placeholder="00" outlined :value="second" @change="second = $event"></v-text-field></v-col>
-            <v-col cols="3">
+            <v-col cols="2">
                 <v-btn class="mt-2" :disabled="!timeValid" large color="primary" @click="setDefaultTime">Set / Reset</v-btn>
             </v-col>            
         </v-row>
@@ -31,11 +32,9 @@ export default {
     created() {
         this.loadTimers();
     },
-    mounted() {      
-        this.listenForTimers();
-    },
     data() {
         return {
+            comPort: '9',
             count: 10,
             hour: '00',
             items: [],
@@ -73,6 +72,11 @@ export default {
             if(val.length < 2) {
                 this.second = this.$getFormatTime(val);
             }
+        },
+        showClocks: function(val) {
+            if(val) {
+                this.listenForTimers();
+            }
         }
     },
     methods: {
@@ -94,7 +98,8 @@ export default {
             }
 
             let timeSetViewModel = {
-                defaults: {                    
+                defaults: {    
+                    comport: this.comPort,                
                     hour: this.hour,
                     minute: this.minute,
                     second: this.second,                    
@@ -135,7 +140,11 @@ export default {
                     }
                 }); 
 
-                connection.invoke("StartListener").catch(function(err) {
+                // Does comPort start with "COM"? If not, append it
+                let comPort = !_self.$isNullOrWhitespace(_self.comPort) && !_self.comPort.toString().startsWith('COM') ? 
+                    'COM' + _self.comPort : _self.comPort;
+
+                connection.invoke("StartListener", comPort).catch(function(err) {
                     _self.$showError(err, 'Timer Listener');
                 });
             }).catch((err) => {      
@@ -148,6 +157,7 @@ export default {
                     if(res.data.defaults) {
                         let defaults = res.data.defaults;
                         
+                        this.comPort = defaults.comPort;
                         this.hour = defaults.hour;
                         this.minute = defaults.minute;
                         this.second = defaults.second;                        

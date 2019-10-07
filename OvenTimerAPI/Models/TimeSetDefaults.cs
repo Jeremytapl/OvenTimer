@@ -5,6 +5,9 @@ namespace OvenTimerAPI
 {
     public class TimeSetDefaults
     {   
+        [JsonProperty(PropertyName = "comport")]
+        public string ComPort { get;set; }
+
         [JsonProperty(PropertyName = "id")]     
         public string Id { get; set; } = "default";
 
