@@ -1,30 +1,36 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Threading.Tasks;
 
-namespace OvenTimerAPI
+namespace OvenTimerAPI.Services
 {
-    public class Arduino : IDisposable
+    public class ArduinoService : IDisposable
     {
         bool _disposed = false;
         SerialPort _port;
 
-        public Arduino(string comPort)
+        public ArduinoService(string comPort, Func<string, Task> callBack)
         { 
-            _port = new SerialPort(comPort, 9600);
-            _port.DtrEnable = true;
+            InitComPort(comPort);
+            ListenForData(callBack);            
+        }       
 
-            _port.Open();
-        }
-
-        ~Arduino()
+        ~ArduinoService()
         {
             Dispose(false);
         }
 
-        public string Read() 
+        private void InitComPort(string comPort)
         {
-            string data = "No data.";
+            _port = new SerialPort(comPort, 9600);
+            _port.DtrEnable = true;
+            
+            _port.Close();
+            _port.Open();
+        }
 
+        private void ListenForData(Func<string, Task> callBack) 
+        {
             while(_port.IsOpen)
             {
                 if(_port.BytesToRead > 0)
@@ -32,13 +38,13 @@ namespace OvenTimerAPI
                     // Indicate transmission received
                     _port.Write("1");
 
-                    data = _port.ReadLine();
+                    var data = _port.ReadLine();
+                    var obj = new object[1];
+                    obj[0] = data;
 
-                    break;
+                    callBack(data);
                 }
             }
-
-            return data;
         }
 
         public void Dispose()

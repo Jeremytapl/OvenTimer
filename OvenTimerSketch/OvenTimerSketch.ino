@@ -44,13 +44,29 @@ void initTimer(int durationSeconds, int intervalMilliSeconds) {
 }
 
 void listenForButtons() {
-  int sensorValue = analogRead(0);
-  
-  if(sensorValue > 60 && sensorValue < 800) {
+  int sensorValue = analogRead(0);  
+
+  if(sensorValue <= 800) {
     timer.start();
     printLCD("Transmitting...", true);
-    
-    Serial.println(sensorValue, DEC);
+
+    if(sensorValue < 60) {
+      // LCD RIGHT Button
+      Serial.println(1);
+    } else if (sensorValue < 200) {
+      // LCD UP Button
+      Serial.println(2);
+    } else if (sensorValue < 400) {
+      // LCD DOWN Button
+      Serial.println(3);
+    } else if (sensorValue < 600) {
+      // LCD LEFT Button
+      Serial.println(4);
+    } else if (sensorValue < 800) {
+      // LCD SELECT Button
+      Serial.println(5);
+    }
+
     delay(100);
   }
 }
@@ -65,7 +81,7 @@ void listenForCommands() {
       timer.stop();
       printLCD("Transmitted.", true);
       
-      delay(2000);      
+      delay(100);      
       initLCD();   
     }      
   } 

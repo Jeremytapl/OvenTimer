@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OvenTimerAPI.Services;
 
 namespace OvenTimerAPI.Controllers
 {
@@ -13,21 +14,30 @@ namespace OvenTimerAPI.Controllers
     public class TimerController : ControllerBase
     {
         private IConfiguration _config;
+        private TimerService _tSvc;
 
         public TimerController(IConfiguration configuration)
         {
             _config = configuration;
+            _tSvc = new TimerService(new TimerContext(configuration));
         }
 
         [HttpGet]
-        public string Get()
+        public ActionResult<TimeSetViewModel> Get()
         {
-            string comPort = _config["ComPort"];
+            return _tSvc.GetTimeSets();
+        }
 
-            using(var arduino = new Arduino(comPort))
-            {
-                return arduino.Read();
-            }
+        [HttpPatch]
+        public void Patch([FromBody]TimeSet timeSet) 
+        {
+            _tSvc.UpdateTimeSet(timeSet);
+        }
+
+        [HttpPost]
+        public void Post([FromBody]TimeSetViewModel timeSets)
+        {
+            _tSvc.AddTimeSets(timeSets);
         }
     }
 }

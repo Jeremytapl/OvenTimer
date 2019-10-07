@@ -1,0 +1,4 @@
+C:\GIT\OvenTimer\OvenTimerAPI\obj\Debug\netcoreapp2.2\OvenTimerAPI.csprojAssemblyReference.cache
+C:\GIT\OvenTimer\OvenTimerAPI\obj\Debug\netcoreapp2.2\OvenTimerAPI.csproj.CoreCompileInputs.cache
+C:\GIT\OvenTimer\OvenTimerAPI\obj\Debug\netcoreapp2.2\OvenTimerAPI.AssemblyInfoInputs.cache
+C:\GIT\OvenTimer\OvenTimerAPI\obj\Debug\netcoreapp2.2\OvenTimerAPI.AssemblyInfo.cs
