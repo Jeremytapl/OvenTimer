@@ -12,12 +12,11 @@ namespace OvenTimerAPI.Services
         public void AddTimeSets(TimeSetViewModel timeSetVM) 
         {   
             _ctx.Database.ExecuteSqlCommand("DELETE FROM TimeSetDefaults");
-            _ctx.TimeSetDefaults.Add(timeSetVM.Defaults);
-
             _ctx.Database.ExecuteSqlCommand("DELETE FROM TimeSets");
+            
+            _ctx.TimeSetDefaults.Add(timeSetVM.Defaults);
             _ctx.TimeSets.AddRange(timeSetVM.TimeSets);
-
-            _ctx.SaveChanges();        
+            _ctx.SaveChanges();
         }
 
         public TimeSet GetTimeSet(string id) 

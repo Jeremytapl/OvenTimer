@@ -95,12 +95,10 @@ export default {
             }
 
             let timeSetViewModel = {
-                defaults: {
-                    defaultTimeSet: {
-                        hour: this.hour,
-                        minute: this.minute,
-                        second: this.second
-                    },
+                defaults: {                    
+                    hour: this.hour,
+                    minute: this.minute,
+                    second: this.second,                    
                     timers: Number.parseInt(this.count)
                 },
                 timesets: this.items
@@ -127,7 +125,7 @@ export default {
             let _self = this;
             connection.start().then(() => {                
                 connection.on('ReceiveInput', (data) => {                    
-                    let key = 'item-' + data.trim();                    
+                    let key = 'item-' + data.trim().trimEnd('-');
                     
                     if(_self.$refs[key] != null && _self.$refs[key].length) {                        
                         _self.$refs[key][0].toggle();
@@ -146,14 +144,10 @@ export default {
                 if(res.data) {        
                     if(res.data.defaults) {
                         let defaults = res.data.defaults;
-
-                        if(defaults.defaultTimeSet) {
-                            let defaultSet = defaults.defaultTimeSet;
-                            
-                            this.hour = defaultSet.hour;
-                            this.minute = defaultSet.minute;
-                            this.second = defaultSet.second;
-                        }
+                        
+                        this.hour = defaults.hour;
+                        this.minute = defaults.minute;
+                        this.second = defaults.second;                        
 
                         if(defaults.timers) {
                             this.count = Number.parseInt(defaults.timers);
