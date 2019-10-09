@@ -112,7 +112,10 @@ export default {
                 this.$showError(err, 'Set Timers');
             });
 
-            this.showClocks = true;
+            let _self = this;
+            this.$nextTick(() => {
+                _self.showClocks = true;
+            });
         },
         getTimeValue: function(item) {
             return `${item.hour}:${item.minute}:${item.second}`;
@@ -129,17 +132,17 @@ export default {
             let _self = this;
             connection.start().then(() => {                
                 connection.on('ReceiveInput', (data) => {                    
-                    let key = 'item-' + data.trim().trimEnd('-');
-                    
+                    let key = 'item-' + data.trim().replace('-', '').replace('x', '');                    
+
                     if(_self.$refs[key] != null && _self.$refs[key].length) {
-                        if(data.toString().endsWith('-')) {
+                        if(data.toString().trim().endsWith('x')) {
                             _self.$refs[key][0].reset();
                         } else {
-                            _self.$refs[key][0].toggle();
-                        }                        
+                            _self.$refs[key][0].startTimer();
+                        }                     
                     }
                 }); 
-
+                
                 // Does comPort start with "COM"? If not, append it
                 let comPort = !_self.$isNullOrWhitespace(_self.comPort) && !_self.comPort.toString().startsWith('COM') ? 
                     'COM' + _self.comPort : _self.comPort;

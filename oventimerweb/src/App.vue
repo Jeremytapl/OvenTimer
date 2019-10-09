@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import Modal from './components/vuetify/modal';
+//import Modal from './components/vuetify/modal';
 
 export default {
   components: {
-    modal: Modal
+    //modal: Modal
   },
   created() {
     document.title = "Timer";

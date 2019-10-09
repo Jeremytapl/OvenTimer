@@ -1,15 +1,18 @@
 <template>    
-    <div :class="isComplete ? 'timer timer-success' : 'timer'">
-        <div class="ml-3">
-            <v-label>{{ $isNullOrWhitespace(caption) ? '' : `Timer ${caption}:` }}</v-label>
+    <div :class="timerCSSClass">
+        <div class="ml-3 display-1">
+            <div class="timer-label">{{ $isNullOrWhitespace(caption) ? '' : `Timer ${caption}:` }}</div>
         </div>
 
         <div :class="'timer-container'" @change="$emit('input', value)" no-gutters>
-            <span><v-text-field class="display-1 input-size inline-block" placeholder="00" readonly :value="hour"></v-text-field></span>        
-            <span class="ml-1 display-2 inline-block">:</span>
-            <span><v-text-field class="display-1 input-size inline-block" placeholder="00" readonly :value="minute"></v-text-field></span>        
-            <span class="ml-1 display-2 inline-block">:</span>
-            <span><v-text-field class="display-1 input-size inline-block" placeholder="00" readonly :value="second"></v-text-field></span>
+            <div @keypress="showSaveBtn = true">
+                <span><v-text-field class="display-1 input-size inline-block" placeholder="00" :value="hour" @change="hour = $event"></v-text-field></span>        
+                <span class="ml-1 display-2 inline-block">:</span>
+                <span><v-text-field class="display-1 input-size inline-block" placeholder="00" :value="minute" @change="minute = $event"></v-text-field></span>        
+                <span class="ml-1 display-2 inline-block">:</span>
+                <span><v-text-field class="display-1 input-size inline-block" placeholder="00" :value="second" @change="second = $event"></v-text-field></span>
+                <span class="inline-block" v-if="showSaveBtn"><v-btn class="ml-2 mb-2" color="success" @click="showSaveBtn = false">Save</v-btn></span>
+            </div>
         </div>
     </div>
 </template>
@@ -31,17 +34,36 @@ export default {
         this.parseValue();
     },
     data() {
-        return {     
+        return {
             isComplete: false,
+            inProcess: false,
             initValue: this.value,
             hour: '',
             minute: '',
             second: '',
+            showSaveBtn: false,
             started: false,
-            timer: null
+            timer: null,
+            timerCSSClass: 'timer '
         };
     },
     watch: {
+        isComplete: function(val) {
+            if(val) {
+                this.timerCSSClass = 'timer timer-success';
+
+                this.stopTimer();
+
+                this.inProcess = false;
+            } else {
+                this.timerCSSClass = 'timer ';
+            }
+        },
+        inProcess: function(val) {
+            if(val) {
+                this.timerCSSClass = 'timer timer-processing';
+            }
+        },
         started: function(val) {
             if(val) {
                 this.startTimer();
@@ -69,22 +91,26 @@ export default {
         },        
         reset: function() {
             this.isComplete = false;
-            this.parseValue();            
+            this.stopTimer();
+
+            this.parseValue();
         },
         startTimer: function() {
             if(this.timer == null) {
                 let hourInt = Number.parseInt(this.hour);
                 let minuteInt = Number.parseInt(this.minute);
                 let secondInt = Number.parseInt(this.second);
-
+                
                 let _self = this;
-                this.timer = setInterval(function() {                    
+                this.timer = setInterval(function() {                  
                     // Stop when timer has run out
                     if(hourInt == 0 && minuteInt == 0 && secondInt == 0) {                        
                         _self.isComplete = true;
                         clearInterval(_self.timer);
 
                         return;
+                    } else {
+                        _self.inProcess = true;
                     }
 
                     if(hourInt > 0 && minuteInt == 0) {
@@ -111,20 +137,23 @@ export default {
                 }, 1000);
             }
         },
-        stopTimer: function() {
+        stopTimer: function() {            
             clearInterval(this.timer);
 
             this.timer = null;
+            delete(this.timer);
+
+            this.timerCSSClass = 'timer ';
         },
         toggle: function() {            
             this.started = !this.started;
         },
         updateService: async function() {
             let timeSet = {
-                id: this.timerId,  
-                hour: this.hour,
-                minute: this.minute,
-                second: this.second
+                id: this.timerId.toString(),  
+                hour: this.hour.toString(),
+                minute: this.minute.toString(),
+                second: this.second.toString()
             }
 
             await this.$http.patch('timer', timeSet).catch(err => {
@@ -136,6 +165,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
 .inline-block {
     display: inline-block;
 }
@@ -151,8 +186,17 @@ export default {
     padding: 5px;
 }
 
+.timer-label {
+    font-size: 24px;
+}
+
+.timer-processing {
+    background-color: green;
+}
+
 .timer-success {
-    background-color: #1B5E20;
+    animation: blinker 1s linear infinite;
+    background-color: #ff0000;
 }
 
 .timer-container {
