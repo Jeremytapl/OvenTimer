@@ -128,7 +128,7 @@ export default {
                     } else if(secondInt == 0) {
                         secondInt = 59;
                     }
-
+                    
                     _self.hour = _self.$getFormatTime(hourInt);
                     _self.minute = _self.$getFormatTime(minuteInt);
                     _self.second = _self.$getFormatTime(secondInt);
@@ -142,8 +142,6 @@ export default {
 
             this.timer = null;
             delete(this.timer);
-
-            this.timerCSSClass = 'timer ';
         },
         toggle: function() {            
             this.started = !this.started;
