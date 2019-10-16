@@ -15,7 +15,7 @@
 
         <v-row justify="center" no-gutters v-if="showClocks">
             <v-col :ref="'items'" cols="3" justify="center" v-bind:key="item.id" v-for="item of items">
-                <timer v-model="item.time" :ref="'item-' + item.id" :caption="item.id" :timer-id="item.id"></timer>                
+                <timer v-model="item.time" :ref="'item-' + item.id" :caption="item.id" :default-value="defaultTime" :timer-id="item.id"></timer>                
             </v-col>
         </v-row>
     </div>
@@ -44,6 +44,9 @@ export default {
         };
     },
     computed: {
+        defaultTime: function() {
+            return this.hour + ':' + this.minute + ':' + this.second; 
+        },
         hourValid: function() {
             return this.isValid(this.hour);
         },

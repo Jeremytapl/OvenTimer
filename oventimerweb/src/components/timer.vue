@@ -11,7 +11,8 @@
                 <span><v-text-field class="display-1 input-size inline-block" placeholder="00" :value="minute" @change="minute = $event"></v-text-field></span>        
                 <span class="ml-1 display-2 inline-block">:</span>
                 <span><v-text-field class="display-1 input-size inline-block" placeholder="00" :value="second" @change="second = $event"></v-text-field></span>
-                <span class="inline-block" v-if="showSaveBtn"><v-btn class="ml-2 mb-2" color="success" @click="showSaveBtn = false">Save</v-btn></span>
+                <span class="inline-block" v-if="showSaveBtn"><v-btn class="ml-2 mb-3" small color="success" @click="showSaveBtn = false">Save</v-btn></span>
+                <span><v-btn class="ml-2 mb-3" small color="warning" @click="reset(true)"><i class="material-icons">refresh</i></v-btn></span>
             </div>
         </div>
     </div>
@@ -21,6 +22,9 @@
 export default {
     props: {
         caption: null,
+        defaultValue: {
+            type: String
+        },
         timerId: {
             required: true,
             type: String
@@ -48,8 +52,8 @@ export default {
         };
     },
     watch: {
-        isComplete: function(val) {
-            if(val) {
+        isComplete: function(val) {                                
+            if(val) {                
                 this.timerCSSClass = 'timer timer-success';
 
                 this.stopTimer();
@@ -62,6 +66,10 @@ export default {
         inProcess: function(val) {
             if(val) {
                 this.timerCSSClass = 'timer timer-processing';
+            } else {
+                if(!this.isComplete) {
+                    this.timerCSSClass = 'timer ';
+                }
             }
         },
         started: function(val) {
@@ -80,20 +88,28 @@ export default {
     methods: {
         parseValue: function() {
             if(this.initValue != null) {
-                let splitter = this.initValue.toString().split(':');
+                let time = this.initValue == '00:00:00' && this.defaultValue != null ? this.defaultValue : this.initValue;
+                let splitter = time.toString().split(':');
 
                 if(splitter.length == 3) {
                     this.hour = splitter[0];
                     this.minute = splitter[1];
                     this.second = splitter[2];
                 }
+
+                if(this.hour == '00' && this.minute == '00' && this.second == '00') {
+                    this.isComplete = true;
+                }
             }
         },        
-        reset: function() {
-            this.isComplete = false;
-            this.stopTimer();
-
-            this.parseValue();
+        reset: function(hardReset) {
+            if(this.isComplete || hardReset) {
+                this.isComplete = false;          
+                this.inProcess = false;      
+                
+                this.stopTimer();
+                this.parseValue();
+            }
         },
         startTimer: function() {
             if(this.timer == null) {
@@ -163,6 +179,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../node_modules/material-design-icons/iconfont/material-icons.css';
+
 @keyframes blinker {
   50% {
     opacity: 0;
