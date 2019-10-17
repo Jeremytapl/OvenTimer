@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
   </ItemGroup>
 
+  <Target Name="oventimerweb" BeforeTargets="ComputeFilesToPublish">
+    <Exec Command="npm install" WorkingDirectory="oventimerweb"></Exec>
+    <Exec Command="npm run build" WorkingDirectory="oventimerweb"></Exec>
+  </Target>
 </Project>

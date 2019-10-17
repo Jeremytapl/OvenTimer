@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace OvenTimerAPI
 {
@@ -19,6 +13,12 @@ namespace OvenTimerAPI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            // Create database directory if it's not there
+            if(!Directory.Exists("db"))
+            {
+                Directory.CreateDirectory("db");
+            }
 
             using (var db = new TimerContext(configuration))
             {
@@ -62,7 +62,10 @@ namespace OvenTimerAPI
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<TimerHub>("/timerHub"); 
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}");
             });
+
+            app.UseStaticFiles();            
         }
     }
 }
